@@ -1,0 +1,98 @@
+@import url('https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap');
+
+a{
+    text-decoration: none;
+}
+
+.dashboard-container {
+    background-color: #FFFFFF;
+    margin-top: 80px;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.admin-form{
+    font-family: "Urbanist", sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1E2A57;
+}
+
+.button {
+    font-family: "Figtree", sans-serif;
+    font-size: 14px;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    display: flex;
+    gap: 8px;
+    
+}
+
+.button-primary{
+    background-color: #1E2A57;
+    color: #FFFFFF;
+}
+
+.button-primary:hover {
+    background-color: #354068;
+}
+
+.spinner-border {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: 0.15em solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spinner-border .75s linear infinite;
+}
+
+@keyframes spinner-border {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.page-title{
+    font-family: Urbanist, sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: #1E2A57;
+}
+
+.table{
+    font-family: "Figtree", sans-serif;
+    font-size: 14px;
+}
+
+.table th, .table td{
+    height: 65px;
+}
+
+.table th, .table td{
+    padding: 10px 15px;
+    vertical-align: middle;
+    
+}
+
+.table th{
+    background-color: #F7F7F7;
+    color: #404040;
+}
+
+.table .number-column{
+    width: 25px;
+}
+
+.table .action-column{
+    width: 100px;
+}
+
+.sub-menu{
+    list-style: none;
+}
+  
