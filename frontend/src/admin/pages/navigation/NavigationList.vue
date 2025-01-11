@@ -117,9 +117,8 @@ export default {
       this.loadNavigationMenus(); // Fetch data again when the search query changes
     },
 
-    editMenu(id) {
-      console.log("Edit menu with ID:", id);
-      // Implement logic to edit the menu
+    async editMenu(id) {
+      this.$router.push({ name: "EditMenu", params: { id } });
     },
 
     deleteMenu(id) {

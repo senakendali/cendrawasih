@@ -2,30 +2,35 @@
   <div>
     <!-- Main Banner Section -->
     <div class="image-container w-100 h-100">
-      <img src="@/assets/images/main/banner/main-banner.png" alt="Logo" class="img-fluid w-100 h-100"/>
+      <img src="@/assets/images/main/banner/main-banner.png" alt="Logo" class="img-fluid w-100 h-100" />
       <div :class="['caption-overlay', isScrolled ? 'scrolled' : '']">
         <div class="caption-content">
-          <h1 class="caption-title">Jakarta Pencak Silat Tournament</h1>
-          <p class="caption-description">This is the description text for the banner. It explains the purpose of the image or provides context.</p>
-          <button class="btn btn-primary">Daftar</button>
+          <h1 class="caption-title">Bogor Pencak Silat Series 1 Tahun 2025</h1>
+          <p class="caption-description">
+            Kami mengundang para pesilat berbakat untuk bergabung dalam ajang yang penuh semangat dan prestisius ini. Tunjukkan keahlian Anda dalam seni bela diri tradisional Indonesia dan buktikan bahwa Anda layak menjadi yang terbaik.
+          </p>
+          <router-link to="/pendaftaran" class="btn btn-primary">Daftar</router-link>
         </div>
       </div>
     </div>
 
-    <!-- Gallery Section -->
-    <TournamentGallery />
+    <!-- Why Us Section -->
+    <TournamentInfo />
 
-    
+    <!-- Our Activity Section -->
+    <OurActivity />
   </div>
 </template>
 
 <script>
-import TournamentGallery from '@/components/TournamentGallery.vue';
+import TournamentInfo from '@/components/main/TournamentInfo.vue';
+import OurActivity from '@/components/main/OurActivity.vue';  // Ensure the correct import path
 
 export default {
   name: 'HomePage',
   components: {
-    TournamentGallery,
+    TournamentInfo,
+    OurActivity,  // Register the OurFeature component correctly
   },
   data() {
     return {
@@ -102,7 +107,7 @@ export default {
   font-family: "Urbanist", sans-serif;
 }
 
-.caption-overlay button {
+.caption-overlay .btn-primary {
   font-size: 1rem;
   padding: 10px 20px;
   border: none;
@@ -113,9 +118,7 @@ export default {
   transition: background-color 0.3s ease;
 }
 
-.caption-overlay button:hover {
+.caption-overlay .btn-primary:hover {
   background-color: #FF5722; /* Darker red on hover */
 }
-
-
 </style>

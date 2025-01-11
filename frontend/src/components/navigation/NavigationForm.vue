@@ -1,15 +1,13 @@
 <template>
-
   <div class="dashboard-container">
-    
     <div class="container">
       <div class="mb-2 page-title">
-        <i class="bi bi-file-earmark-text"></i> Create Navigation
+        <i class="bi bi-file-earmark-text"></i> 
+        {{ isEdit ? "Edit Navigation" : "Create Navigation" }}
       </div>
-      <form @submit.prevent="submitForm" class="admin-form mt-4">   
+      <form @submit.prevent="submitForm" class="admin-form mt-4">
         <div class="row">
           <div class="col-lg-6">
-           
             <div class="mb-3">
               <label for="name" class="form-label">Navigation Name</label>
               <input
@@ -21,7 +19,6 @@
               />
               <div class="invalid-feedback">{{ errors.name }}</div>
             </div>
-        
             <div class="mb-3">
               <label for="parent_id" class="form-label">Parent Menu</label>
               <select
@@ -56,7 +53,7 @@
               <div class="invalid-feedback">{{ errors.order }}</div>
             </div>
             <div class="mb-3">
-              <label for="type" class="form-label">Navigation </label>
+              <label for="type" class="form-label">Navigation Type</label>
               <select
                 class="form-select"
                 :class="{ 'is-invalid': errors.type }"
@@ -79,7 +76,7 @@
           <div class="col-lg-12 text-center">
             <button type="submit" class="button button-primary" :disabled="loading">
               <i class="bi bi-floppy"></i>
-              <span>Save Menu</span>
+              <span>{{ isEdit ? "Save Changes" : "Save Menu" }}</span>
             </button>
           </div>
         </div>
@@ -91,43 +88,73 @@
 <script>
 import axios from "axios";
 import { useToast } from "vue-toastification";
-import ProgressBar from "@/components/ProgressBar.vue";
+import ProgressBar from "@/components/admin/ProgressBar.vue";
 
 export default {
-  name: "AddMenuPage",
+  name: "NavigationForm",
   components: {
-    ProgressBar
+    ProgressBar,
+  },
+  props: {
+    isEdit: {
+      type: Boolean,
+      default: false,
+    },
+    menuId: {
+      type: [Number, String],
+      default: null, // Pass menu ID for edit mode
+    },
   },
   setup() {
-    const toast = useToast(); // Use the toast instance
+    const toast = useToast();
     return { toast };
   },
   data() {
     return {
       form: {
         name: "",
-        url: "",
         parent_id: null,
         order: 0,
         type: "public",
       },
-      parents: [], // List of parent menu items
-      errors: {}, // Holds validation errors for each input
-      loading: false, // Add loading state
-      progress: 0, // Progress bar value
+      parents: [], // List of parent menus
+      errors: {}, // Validation errors
+      loading: false, // Loading state
+      progress: 0, // Progress bar percentage
     };
   },
   created() {
     this.fetchParentMenus();
+    if (this.isEdit && this.menuId) {
+      this.fetchMenuDetail(this.menuId);
+    }
   },
   methods: {
     async fetchParentMenus() {
       try {
         const response = await axios.get("/navigation-menus/fetch-all");
-        this.parents = response.data || []; // Ensure it's an array even if the API returns null/undefined
+        this.parents = response.data || [];
       } catch (error) {
         this.toast.error("Error fetching parent menus.");
-        console.error("Error fetching parent menus:", error);
+      }
+    },
+    async fetchMenuDetail(id) {
+      this.loading = true;
+      try {
+        const response = await axios.get(`/navigation-menus/${id}`);
+        if (response.data) {
+          this.form = {
+            name: response.data.name,
+            parent_id: response.data.parent_id || null,
+            order: response.data.order,
+            type: response.data.type,
+          };
+        }
+      } catch (error) {
+        this.toast.error("Error fetching menu details.");
+        console.error("Error fetching menu details:", error);
+      } finally {
+        this.loading = false;
       }
     },
     updateProgress(step) {
@@ -139,38 +166,35 @@ export default {
     async submitForm() {
       this.loading = true;
       this.resetProgress();
-
       const progressInterval = setInterval(() => {
         if (this.progress < 100) {
           this.updateProgress(10);
         } else {
           clearInterval(progressInterval);
         }
-      }, 100); // Increment progress every 300ms
+      }, 100);
 
       try {
-        // Ensure `parent_id` is handled safely
-        this.form.parent_id = this.form.parent_id || null;
-
-        // Clear existing errors
         this.errors = {};
+        const endpoint = this.isEdit
+          ? `/navigation-menus/${this.menuId}` // Update menu
+          : "/navigation-menus"; // Create menu
+        const method = this.isEdit ? "put" : "post";
 
-        // Simulate request
-        await new Promise((resolve) => setTimeout(resolve, 3000));
-
-        await axios.post("/navigation-menus", this.form);
-        this.toast.success("Menu berhasil ditambahkan!");
+        await axios[method](endpoint, this.form);
+        this.toast.success(
+          this.isEdit ? "Menu updated successfully!" : "Menu created successfully!"
+        );
         this.$router.push("/admin/navigation");
       } catch (error) {
         if (error.response && error.response.data.errors) {
-          this.toast.error("Gagal menambahkan menu. Periksa input Anda.");
           this.errors = error.response.data.errors;
         } else {
-          this.toast.error("Gagal menambahkan menu. Periksa input Anda.");
+          this.toast.error("Error processing the form.");
         }
       } finally {
         clearInterval(progressInterval);
-        this.progress = 100; // Ensure progress is full when process completes
+        this.progress = 100;
         this.loading = false;
       }
     },
@@ -179,7 +203,5 @@ export default {
 </script>
 
 <style scoped>
-.progress-bar {
-  transition: width 0.3s ease;
-}
+/* Add custom styles here */
 </style>

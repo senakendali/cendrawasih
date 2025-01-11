@@ -15,6 +15,7 @@ body {
     background-color: #000000;
     min-height: 100vh;
     padding-top: 200px; /* Adjust based on the height of your header */
+    padding-bottom: 20px;
     color: #FFFFFF;
 }
 

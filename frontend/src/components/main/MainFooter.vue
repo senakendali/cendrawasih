@@ -4,14 +4,8 @@
       <!-- Footer Container: Three columns -->
       <div class="container">
         <div class="row">
-          <!-- First Column: Logo and Description -->
-          <div class="col-md-2">
-            <div class="footer-logo">
-              <img src="@/assets/app-logo.png" alt="Company Logo" class="footer-logo-img"/>
-            </div>
-          </div>
-
-          <div class="col-md-7">
+          <!-- First Column: Description -->
+          <div class="col-md-9">
             <h5>About Us</h5>
             <p class="text-white">
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius, sapiente. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Recusandae, ducimus.

@@ -2,7 +2,7 @@
   <nav class="navbar navbar-expand-lg my-navbar fixed-top" :class="{'scrolled': isScrolled}">
     <div class="container">
       <a class="navbar-brand" href="#">
-        <img src="@/assets/app-logo.png" alt="Logo"/>
+        <img src="@/assets/float-logo.png" alt="Logo"/>
       </a>
       <button
         class="navbar-toggler"
@@ -19,9 +19,6 @@
         <ul class="navbar-nav ms-auto me-3">
           <li class="nav-item">
             <router-link to="/" class="nav-link" exact-active-class="active">Beranda</router-link>
-          </li>
-          <li class="nav-item">
-            <router-link to="/kejuaraan" class="nav-link" exact-active-class="active">Kejuaraan</router-link>
           </li>
           <li class="nav-item">
             <router-link to="/pendaftaran" class="nav-link" exact-active-class="active">Pendaftaran</router-link>
@@ -64,6 +61,12 @@ export default {
   background-color: transparent; /* Set navbar background to transparent initially */
   padding: 10px;
   transition: background-color 0.3s ease; /* Smooth transition for background color change */
+  height: 120px;
+}
+
+.navbar-brand{
+  position: fixed;
+  top:-80px;
 }
 
 .my-navbar.scrolled {

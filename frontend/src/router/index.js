@@ -10,7 +10,8 @@ import TournamentPage from '@/main/pages/TournamentPage.vue';
 import SchedulePage from '@/main/pages/SchedulePage.vue';
 import GalleryDetail from '@/main/pages/GalleryDetail.vue';
 import AdminNavigationList from '../admin/pages/navigation/NavigationList.vue';
-import AdminNavigationForm from '../admin/pages/navigation/NavigationForm.vue';
+import NavigationCreatePage from "@/admin/pages/navigation/NavigationCreatePage.vue";
+import NavigationEditPage from "@/admin/pages/navigation/NavigationEditPage.vue";
 
 const routes = [
   {
@@ -78,15 +79,17 @@ const routes = [
     path: '/admin/navigation/create',
     component: AdminLayout,
     children: [
-      { path: '', component: AdminNavigationForm }
+      { path: '', component: NavigationCreatePage }
     ]
     //meta: { requiresAdmin: true }  // admin-only form for menu
   },
   {
-    path: '/admin/navigation/edit/:id?',
+    path: '/admin/navigation/edit/:id',
+    name: "EditMenu",
     component: AdminLayout,
+    props: true, // Kirim parameter ID ke komponen sebagai props
     children: [
-      { path: '', component: AdminNavigationForm }
+      { path: '', component: NavigationEditPage }
     ]
     //meta: { requiresAdmin: true }  // admin-only form for menu
   },
