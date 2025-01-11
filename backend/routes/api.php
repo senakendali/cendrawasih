@@ -23,15 +23,11 @@ Route::apiResource('subdistricts', SubdistrictController::class);
 Route::apiResource('wards', WardController::class);
 
 //Navigation Menus
-Route::prefix('navigation-menus')->group(function () {
-    // Resource route for CRUD operations
-    Route::apiResource('', NavigationMenuController::class);
-
-    // Custom route
-    Route::get('fetch-all', [NavigationMenuController::class, 'fetchAllNavigation']);
-});
+Route::get('navigation-menus/fetch-all', [NavigationMenuController::class, 'fetchAllNavigation']);
+Route::apiResource('navigation-menus', NavigationMenuController::class);
 
 
 //Auth
+Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
