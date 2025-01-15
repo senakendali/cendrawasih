@@ -2,7 +2,7 @@
     <div class="tournament-info">
       <div class="container">
         <div class="row">
-          <h2 class="section-title">Informasi Kegiatan?</h2>  
+          <h2 class="section-title">Informasi Kegiatan</h2>  
           <div class="col-md-3 mb-4">
             <div class="tournament-info-item">
               

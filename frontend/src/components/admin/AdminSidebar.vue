@@ -4,76 +4,66 @@
       <img src="@/assets/app-logo.png" alt="Logo" />
     </a>
     <ul class="nav flex-column">
-      <li class="nav-item">
-        <a class="nav-link text-start" href="#">
-          <i class="bi bi-speedometer2 me-2"></i> Dashboard
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link text-start" href="#">
-          <i class="bi bi-trophy me-2"></i> Matches
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link text-start" href="#">
-          <i class="bi bi-people me-2"></i> Contingent
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link text-start" href="#">
-          <i class="bi bi-award me-2"></i> Tournament
-        </a>
-      </li>
-      <li class="nav-item">
-        <a
-          class="nav-link text-start d-flex justify-content-between"
-          href="#"
-          @click="toggleSubMenu"
+      <li v-for="menu in menus" :key="menu.id" class="nav-item">
+        <router-link
+          class="nav-link text-start"
+          :to="'/admin/' + menu.url"  
+          @click.prevent="toggleSubMenu(menu.id, menu.children)"
         >
-          <span>
-            <i class="bi bi-gear me-2"></i> Settings
-          </span>
-          <i :class="isSubMenuOpen ? 'bi bi-dash-circle' : 'bi bi-plus-circle'"></i>
-        </a>
-        <ul v-if="isSubMenuOpen" class="sub-menu">
-          <li class="nav-item">
-            <a class="nav-link text-start" href="#">
-              <i class="bi bi-sliders me-2"></i> General
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link text-start" href="#">
-              <i class="bi bi-people-fill me-2"></i> User Management
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link text-start" href="#">
-              <i class="bi bi-palette me-2"></i> Appearance
-            </a>
+          <i :class="menu.icon + ' me-2'"></i> {{ menu.name }}
+          <i v-if="menu.children" :class="isSubMenuOpen === menu.id ? 'bi bi-dash-circle' : 'bi bi-plus-circle'"></i>
+        </router-link>
+        <ul v-if="menu.children && isSubMenuOpen === menu.id" class="sub-menu">
+          <li v-for="child in menu.children" :key="child.id" class="nav-item">
+            <router-link
+              class="nav-link text-start"
+              :to="'/admin/' + child.url"  
+            >
+              <i :class="child.icon + ' me-2'"></i> {{ child.name }}
+            </router-link>
           </li>
         </ul>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link text-start" href="#">
-          <i class="bi bi-file-earmark-bar-graph me-2"></i> Reports
-        </a>
       </li>
     </ul>
   </aside>
 </template>
 
+
 <script>
+import axios from "axios";
+
 export default {
   name: "AdminSidebar",
   data() {
     return {
-      isSubMenuOpen: false, // Controls the visibility of the "Settings" submenu
+      isSubMenuOpen: null, // Keeps track of the currently open submenu
+      menus: [], // Stores the fetched menus
     };
   },
   methods: {
-    toggleSubMenu() {
-      this.isSubMenuOpen = !this.isSubMenuOpen; // Toggle the submenu
+    toggleSubMenu(menuId, children) {
+      if (children) {
+        // Toggle the visibility of the submenu
+        this.isSubMenuOpen = this.isSubMenuOpen === menuId ? null : menuId;
+      }
     },
+    async fetchMenus() {
+      try {
+        // Replace with the actual URL of your API
+        const response = await axios.get("/menus", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`, // Assumes token is in localStorage
+          },
+        });
+
+        this.menus = response.data; // Store the menu data in the component state
+      } catch (error) {
+        console.error("Error fetching menus:", error);
+      }
+    },
+  },
+  mounted() {
+    this.fetchMenus(); // Fetch menus when the component is mounted
   },
 };
 </script>
@@ -87,7 +77,7 @@ export default {
   padding: 20px 10px;
   display: flex;
   flex-direction: column;
-  align-items: center; /* Centers content horizontally */
+  align-items: center;
 }
 
 .navbar-brand {
@@ -96,7 +86,7 @@ export default {
 }
 
 .navbar-brand img {
-  max-width: 100px; /* Limit logo width */
+  max-width: 100px;
   height: auto;
 }
 
@@ -109,7 +99,7 @@ export default {
   padding: 10px;
   text-decoration: none;
   display: flex;
-  align-items: center; /* Align text and icon vertically */
+  align-items: center;
 }
 
 .nav-item .nav-link:hover {
@@ -119,11 +109,11 @@ export default {
 
 .sub-menu {
   margin-top: 5px;
-  margin-left: 20px; /* Indent child menu items */
+  margin-left: 20px;
 }
 
 .sub-menu .nav-link {
-  font-size: 0.9rem; /* Slightly smaller font size for submenu items */
+  font-size: 0.9rem;
 }
 
 .sub-menu .nav-link:hover {
@@ -131,6 +121,6 @@ export default {
 }
 
 .bi {
-  font-size: 1.2rem; /* Adjust icon size */
+  font-size: 1.2rem;
 }
 </style>

@@ -76,7 +76,7 @@ export default {
           { withCredentials: true }
         );
 
-        // Save the token and user data to localStorage
+        // Save the token and user data to localStorage 
         localStorage.setItem("authToken", response.data.access_token); 
         localStorage.setItem("user", JSON.stringify(response.data.user));
 

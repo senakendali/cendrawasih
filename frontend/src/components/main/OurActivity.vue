@@ -19,7 +19,7 @@
           <div class="activity-item mb-4">
             <div class="activity-item-content">
               <h5>Technical Meeting</h5>
-              <p>Technical Meeting akan dilaksanakan pada tanggal?.</p>
+              <p>Technical Meeting akan dilaksanakan pada tanggal 16 Februari 2025</p>
             </div>
           </div>
         </div>

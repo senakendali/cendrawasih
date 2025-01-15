@@ -1,5 +1,8 @@
 <template>
   <div>
+    <!-- Loader -->
+    <div v-if="isLoading" class="loading-bar"></div>
+
     <!-- Main Banner Section -->
     <div class="image-container w-100 h-100">
       <img src="@/assets/images/main/banner/main-banner.png" alt="Logo" class="img-fluid w-100 h-100" />
@@ -9,7 +12,10 @@
           <p class="caption-description">
             Kami mengundang para pesilat berbakat untuk bergabung dalam ajang yang penuh semangat dan prestisius ini. Tunjukkan keahlian Anda dalam seni bela diri tradisional Indonesia dan buktikan bahwa Anda layak menjadi yang terbaik.
           </p>
-          <router-link to="/pendaftaran" class="btn btn-primary">Daftar</router-link>
+          <div class="d-flex gap-2 justify-content-center">
+            <router-link to="/pendaftaran" class="btn btn-primary">Daftar</router-link>
+            <button @click="downloadDocument('PROPOSAL-BPSS1.pdf')" class="btn btn-primary">Download</button>
+          </div>
         </div>
       </div>
     </div>
@@ -22,43 +28,86 @@
   </div>
 </template>
 
+
 <script>
 import TournamentInfo from '@/components/main/TournamentInfo.vue';
-import OurActivity from '@/components/main/OurActivity.vue';  // Ensure the correct import path
+import OurActivity from '@/components/main/OurActivity.vue';
+import axios from 'axios'; // Axios for API requests
 
 export default {
   name: 'HomePage',
   components: {
     TournamentInfo,
-    OurActivity,  // Register the OurFeature component correctly
+    OurActivity,
   },
   data() {
     return {
-      isScrolled: false, // Flag to track whether the page has been scrolled
+      isScrolled: false,
+      isLoading: false, // State to manage loader visibility
     };
   },
   mounted() {
-    // Listen to scroll event on mounted
     window.addEventListener('scroll', this.handleScroll);
   },
   beforeUnmount() {
-    // Clean up the event listener when the component is destroyed
     window.removeEventListener('scroll', this.handleScroll);
   },
   methods: {
     handleScroll() {
-      // Check if page has been scrolled more than 100px
-      if (window.scrollY > 100) {
-        this.isScrolled = true;
-      } else {
-        this.isScrolled = false;
+      this.isScrolled = window.scrollY > 100;
+    },
+    async downloadDocument(filename) {
+      this.isLoading = true; // Show loader
+      try {
+        const response = await axios.get(
+          `/download-document/${filename}`,
+          { responseType: 'blob' } // Ensure the file is treated as binary data
+        );
+
+        // Create a link element and trigger a download
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', filename); // Set the downloaded file name
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      } catch (error) {
+        console.error('Error downloading the document:', error);
+        alert('Failed to download the document. Please try again later.');
+      } finally {
+        this.isLoading = false; // Hide loader
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
+
 <style scoped>
+
+/* Loading Bar Style */
+.loading-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background-color: #D32F2F; /* Red color for the loader */
+  z-index: 9999; /* Ensure the loader stays on top */
+  animation: loading 1s infinite linear; /* Animation for the loader */
+}
+
+/* Define animation for the loading bar */
+@keyframes loading {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
 /* Container to hold the image and caption */
 .image-container {
   position: relative;

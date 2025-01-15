@@ -12,6 +12,13 @@ import GalleryDetail from '@/main/pages/GalleryDetail.vue';
 import AdminNavigationList from '../admin/pages/navigation/NavigationList.vue';
 import NavigationCreatePage from "@/admin/pages/navigation/NavigationCreatePage.vue";
 import NavigationEditPage from "@/admin/pages/navigation/NavigationEditPage.vue";
+import AdminContingetList from '../admin/pages/contingent/ContingentList.vue';
+import ContingentCreatePage from "@/admin/pages/contingent/ContingentCreatePage.vue";
+import ContingentEditPage from "@/admin/pages/contingent/ContingentEditPage.vue";
+import AdminTeamMembersList from '../admin/pages/team-members/MembersList.vue';
+import TeamMembersCreatePage from "@/admin/pages/team-members/MembersCreatePage.vue";
+import TeamMembersEditPage from "@/admin/pages/team-members/MembersEditPage.vue";
+
 
 const routes = [
   {
@@ -90,6 +97,60 @@ const routes = [
     props: true, // Kirim parameter ID ke komponen sebagai props
     children: [
       { path: '', component: NavigationEditPage }
+    ]
+    //meta: { requiresAdmin: true }  // admin-only form for menu
+  },
+  {
+    path: '/admin/contingent',
+    component: AdminLayout,
+    children: [
+      { path: '', component: AdminContingetList }
+    ]
+    //meta: { requiresAdmin: true }  // for admin-only route
+  },
+  {
+    path: '/admin/contingent/create',
+    component: AdminLayout,
+    children: [
+      { path: '', component: ContingentCreatePage }
+    ]
+    //meta: { requiresAdmin: true }  // admin-only form for menu
+  },
+  {
+    path: '/admin/contingent/edit/:id',
+    name: 'EditContingent',
+    component: AdminLayout, // This should be the main layout component
+    props: true, // This makes the route parameters available as props to your component
+    children: [
+      {
+        path: '', // Empty path indicates this is the default child route
+        component: ContingentEditPage, // The component rendered inside the <router-view> in AdminLayout
+      }
+    ]
+  },
+  {
+    path: '/admin/team-members',
+    component: AdminLayout,
+    children: [
+      { path: '', component: AdminTeamMembersList }
+    ]
+    //meta: { requiresAdmin: true }  // for admin-only route
+  },
+  {
+    path: '/admin/team-members/create',
+    component: AdminLayout,
+    children: [
+      { path: '', component: TeamMembersCreatePage }
+    ]
+    //meta: { requiresAdmin: true }  // admin-only form for menu
+  },
+  {
+    path: '/admin/team-members/edit/:id',
+    name: "EditMember",
+    component: AdminLayout,
+    props: true, // Kirim parameter ID ke komponen sebagai props
+    children: [
+      { path: '', component: TeamMembersEditPage }
     ]
     //meta: { requiresAdmin: true }  // admin-only form for menu
   },
