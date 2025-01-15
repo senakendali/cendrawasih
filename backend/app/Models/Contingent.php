@@ -6,12 +6,17 @@ use Illuminate\Database\Eloquent\Model;
 
 class Contingent extends Model
 {
-    protected $table = 'contingent';
+    protected $table = 'contingents';
     protected $guarded = ['created_at', 'updated_at'];
     protected $dates = ['created_at', 'updated_at'];
 
-    public function tournament()
+    public function owner()
     {
-        return $this->belongsTo(Tournament::class);
+        return $this->belongsTo(User::class, 'owner_id');
+    }
+
+    public function teamMembers()
+    {
+        return $this->hasMany(TeamMember::class);
     }
 }

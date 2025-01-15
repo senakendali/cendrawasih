@@ -16,6 +16,8 @@ class NavigationMenuController extends Controller
         })->orderBy('order')->paginate(10); // Paginate 10 items per page
 
         return response()->json($menus);
+
+    
     }
 
     public function fetchAllNavigation()

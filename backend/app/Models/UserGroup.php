@@ -12,9 +12,16 @@ class UserGroup extends Model
 
     protected $fillable = ['name'];
 
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
     public function roles()
     {
-        return $this->belongsToMany(Role::class, 'group_role');
+        return $this->belongsToMany(Role::class, 'group_role', 'user_group_id', 'role_id');
     }
+
+    
 }
 

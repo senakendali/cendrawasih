@@ -7,6 +7,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
+use App\Models\Role; 
 
 
 class User extends Authenticatable
@@ -49,4 +50,11 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function group()
+    {
+        return $this->belongsTo(UserGroup::class);
+    }
+
+    
 }

@@ -8,6 +8,8 @@ class Role extends Model
 {
     public function groups()
     {
-        return $this->belongsToMany(\App\Models\UserGroup::class, 'group_role');
+        return $this->belongsToMany(Group::class, 'group_role', 'role_id', 'user_group_id');
     }
 }
+
+
