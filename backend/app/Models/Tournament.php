@@ -10,8 +10,20 @@ class Tournament extends Model
     protected $guarded = ['created_at', 'updated_at'];
     protected $dates = ['created_at', 'updated_at'];
 
-    public function contingents()
+    public function tournamentActivities()
     {
-        return $this->hasMany(Contingent::class);
+        return $this->hasMany(TournamentActivity::class);
     }
+
+    public function tournamentCategories()
+    {
+        return $this->hasMany(TournamentCategory::class);
+    }
+
+    public function tournamentAgeCategories()
+    {
+        return $this->hasMany(TournamentAgeCategory::class);
+    }
+
+   
 }

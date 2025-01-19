@@ -24,6 +24,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'group_id',
     ];
 
     protected $with = ['roles'];
@@ -53,7 +54,7 @@ class User extends Authenticatable
 
     public function group()
     {
-        return $this->belongsTo(UserGroup::class);
+        return $this->belongsTo(UserGroup::class, 'group_id'); 
     }
 
     

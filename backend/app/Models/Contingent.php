@@ -19,4 +19,9 @@ class Contingent extends Model
     {
         return $this->hasMany(TeamMember::class);
     }
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class);
+    }
 }

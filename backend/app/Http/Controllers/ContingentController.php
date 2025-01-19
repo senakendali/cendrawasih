@@ -13,8 +13,67 @@ class ContingentController extends Controller
     public function index()
     {
         try {
-            $contingents = Contingent::all();
-            return response()->json(['data' => $contingents], 200);
+            $user = auth()->user(); // Mendapatkan user yang sedang login
+        
+            // Pastikan eager loading untuk menghindari lazy loading
+            $user->load('group'); 
+        
+            if ($user->group && $user->group->name === 'Owner') {
+                $contingents = Contingent::paginate(10); // Default: tidak ada filter
+                
+            } else {
+                $contingents = Contingent::where('owner_id', $user->id)->paginate(10);
+            }
+        
+            return response()->json($contingents, 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+        
+    }
+
+    public function fetchAll(){
+        try {
+            $user = auth()->user(); // Mendapatkan user yang sedang login
+        
+            // Pastikan eager loading untuk menghindari lazy loading
+            $user->load('group'); 
+        
+            if ($user->group && $user->group->name === 'Owner') {
+                $contingents = Contingent::all(); // Default: tidak ada filter
+                
+            } else {
+                $contingents = Contingent::where('owner_id', $user->id)->get();
+            }
+        
+            return response()->json($contingents, 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function checkMyContingentsStatus(){
+        try {
+            $user = auth()->user(); // Get the logged-in user
+        
+            // Ensure eager loading to avoid lazy loading issues
+            $user->load('group');
+        
+            // Fetch the relevant contingents based on owner
+            $contingents = Contingent::where('owner_id', $user->id)->get();
+        
+            // Check if the contingents are already registered for a given tournament
+            $tournamentId = request()->input('tournament_id');
+            if ($tournamentId) {
+                $contingents->each(function ($contingent) use ($tournamentId) {
+                    // Add is_registered status to each contingent
+                    $contingent->is_registered = \App\Models\TournamentContingent::where('tournament_id', $tournamentId)
+                        ->where('contingent_id', $contingent->id)
+                        ->exists();
+                });
+            }
+        
+            return response()->json($contingents, 200);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
@@ -42,6 +101,7 @@ class ContingentController extends Controller
             'pic_name' => 'required|string|max:255',
             'pic_email' => 'required|email|max:255|unique:contingents,pic_email',
             'pic_phone' => 'required|string|max:255',
+            'country_id' => 'required|exists:countries,id',
             'province_id' => 'required|exists:provinces,id',
             'district_id' => 'required|exists:districts,id',
             'subdistrict_id' => 'required|exists:subdistricts,id',

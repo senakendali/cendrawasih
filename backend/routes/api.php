@@ -12,7 +12,8 @@ use App\Http\Controllers\MenuController;
 use App\Http\Controllers\ContingentController; 
 use App\Http\Controllers\TeamMemberController;
 use App\Http\Controllers\DocumentController;
-
+use App\Http\Controllers\CountryController;
+use App\Http\Controllers\TournamentController;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     $user = $request->user();
@@ -32,6 +33,22 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // Menus
 Route::middleware('auth:sanctum')->get('/menus', [MenuController::class, 'index']);
 
+//Tournaments
+
+//Route::apiResource('tournaments', TournamentController::class);
+
+Route::prefix('tournaments')->group(function () {
+    // Resource route for CRUD operations
+    Route::apiResource('', TournamentController::class);
+
+    // Custom route
+    
+    Route::middleware('auth:sanctum')->post('register', [TournamentController::class, 'contingentRegistration']);
+    Route::get('highlight', [TournamentController::class, 'getHighlightedTournament']);
+    Route::get('detail/{slug}', [TournamentController::class, 'getTournamentDetail']); 
+    Route::get('{id}', [TournamentController::class, 'show']);
+});
+
 //Provinces
 Route::apiResource('provinces', ProvinceController::class);
 //Districts
@@ -46,14 +63,18 @@ Route::get('navigation-menus/fetch-all', [NavigationMenuController::class, 'fetc
 Route::apiResource('navigation-menus', NavigationMenuController::class);
 
 //Contingents
-Route::get('contingents/fetch-all', [ContingentController::class, 'index']);
-Route::apiResource('contingents', ContingentController::class);
+Route::middleware('auth:sanctum')->get('contingents/fetch-all', [ContingentController::class, 'fetchAll']);
+Route::middleware('auth:sanctum')->get('contingents/my-contingents', [ContingentController::class, 'checkMyContingentsStatus']);
+Route::middleware('auth:sanctum')->apiResource('contingents', ContingentController::class);
 
 //Team Members
-Route::apiResource('team-members', TeamMemberController::class);
+Route::middleware('auth:sanctum')->apiResource('team-members', TeamMemberController::class);
 
 //Documents
 Route::get('/download-document/{filename}', [DocumentController::class, 'download']);
+
+//countries
+Route::get('countries', [CountryController::class, 'index']);
 
 
 //Auth

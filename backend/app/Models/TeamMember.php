@@ -14,6 +14,11 @@ class TeamMember extends Model
     {
         return $this->belongsTo(Contingent::class);
     }
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class);
+    }
 }
 
 
