@@ -157,5 +157,9 @@
   .tournament-info-item img {
     height: 100%;
   }
+
+  .section-title {
+    text-align: center;
+  }
 }
 </style>

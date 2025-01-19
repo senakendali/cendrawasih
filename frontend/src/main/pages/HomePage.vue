@@ -5,7 +5,9 @@
 
     <!-- Main Banner Section -->
     <div class="image-container w-100 h-100">
-      <img src="@/assets/images/main/banner/main-banner.png" alt="Logo" class="img-fluid w-100 h-100" />
+     
+      <img v-if="!isMobile" src="@/assets/images/main/banner/main-banner.png" alt="Logo" class="img-fluid w-100 h-100" />
+      <img v-else src="@/assets/images/main/banner/m-main-banner.png" alt="Logo" class="img-fluid w-100 h-100" />
       <div v-if="!isLoading" :class="['caption-overlay', isScrolled ? 'scrolled' : '']">
         <div class="caption-content">
           <h1 class="caption-title">{{ tournamentName }}</h1>
@@ -55,6 +57,7 @@ export default {
   },
   data() {
     return {
+      isMobile: false,
       isScrolled: false,
       isLoading: false, // State to manage loader visibility
       tournamentId: null,
@@ -71,21 +74,23 @@ export default {
       activities: [],
     };
   },
-
   created() {
     this.fetchTournamentDetail();
   },
   mounted() {
+    this.checkIfMobile();
     window.addEventListener('scroll', this.handleScroll);
   },
   beforeUnmount() {
     window.removeEventListener('scroll', this.handleScroll);
   },
   methods: {
+    checkIfMobile() { 
+      this.isMobile = window.innerWidth <= 768; 
+    },
     handleScroll() {
       this.isScrolled = window.scrollY > 100;
     },
-
     async fetchTournamentDetail() {
       this.isLoading = true; // Show loader
       try {
@@ -223,5 +228,106 @@ export default {
 
 .caption-overlay .btn-primary:hover {
   background-color: #FF5722; /* Darker red on hover */
+}
+
+/* For mobile devices */
+@media only screen and (max-width: 600px) {
+
+  .caption-overlay {
+    position:static;
+    background-color: #000000; /* Semi-transparent black background */
+    padding: 20px 30px;
+    width: 100%; /* Full width */
+    box-sizing: border-box; /* To include padding in the width */
+    transform: none;
+  }
+
+  .caption-overlay.scrolled {
+    position: static; /* Change to absolute when scrolled */
+   
+  }
+
+  .caption-content {
+    text-align: center;
+  }
+
+  .caption-title {
+    font-family: "Urbanist", sans-serif;
+    color: white;
+    font-size: 2.5rem; /* Adjust font size */
+    margin-bottom: 10px;
+  }
+
+  .caption-description {
+    color: white;
+    font-size: 1.2rem; /* Adjust font size */
+    margin-bottom: 20px;
+    font-family: "Urbanist", sans-serif;
+  }
+
+  .caption-overlay .btn-primary {
+    font-size: 1rem;
+    padding: 10px 20px;
+    border: none;
+    background-color: #D32F2F; /* Red background for the button */
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+  }
+
+  .caption-overlay .btn-primary:hover {
+    background-color: #FF5722; /* Darker red on hover */
+  }
+}
+
+/* For tablets */
+@media only screen and (max-width: 768px) {
+  .caption-overlay {
+    position:static;
+    background-color: #000000; /* Semi-transparent black background */
+    padding: 20px 30px;
+    width: 100%; /* Full width */
+    box-sizing: border-box; /* To include padding in the width */
+    transform: none;
+  }
+
+  .caption-overlay.scrolled {
+    position: static; /* Change to absolute when scrolled */
+   
+  }
+
+  .caption-content {
+    text-align: center;
+  }
+
+  .caption-title {
+    font-family: "Urbanist", sans-serif;
+    color: white;
+    font-size: 2.5rem; /* Adjust font size */
+    margin-bottom: 10px;
+  }
+
+  .caption-description {
+    color: white;
+    font-size: 1.2rem; /* Adjust font size */
+    margin-bottom: 20px;
+    font-family: "Urbanist", sans-serif;
+  }
+
+  .caption-overlay .btn-primary {
+    font-size: 1rem;
+    padding: 10px 20px;
+    border: none;
+    background-color: #D32F2F; /* Red background for the button */
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+  }
+
+  .caption-overlay .btn-primary:hover {
+    background-color: #FF5722; /* Darker red on hover */
+  }
 }
 </style>

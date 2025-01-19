@@ -5,7 +5,11 @@
         <div class="col-lg-12">
           <h1>Pendaftaran</h1>
           <p>
-            Pendaftaran Telah Dibuka! Jangan Lewatkan Kesempatan untuk Bertanding dengan Atlet-Atlet Berbakat Lainnya. Dapatkan Hadiah Menarik dan Sertifikat Peserta!
+            Pendaftaran Telah Dibuka! Jangan Lewatkan Kesempatan untuk Bertanding dengan Atlet-Atlet Berbakat Lainnya. 
+            
+          </p>
+          <p>
+            Untuk mengikuti kejuaraan ini, Anda harus memiliki akun terlebih dahulu untuk mendaftarkan kontingen Anda. Jika sudah memiliki akun, silahkan login dan mulai mendaftarkan kontingen dan atlit Anda untuk mengikut kejuaraan ini.
           </p>
         </div>
       </div>
@@ -101,10 +105,16 @@ export default {
         const response = await axios.post(`${API.API_BASE_URL}/register`, this.formData);
         
         // Show success toast
-        useToast().success('Pendaftaran berhasil!');
+        useToast().success('Pendaftaran berhasil! Sebentar lagi Anda akan di arahkan ke halaman Login.');
 
         // Handle success (e.g., redirect or show a success message)
         console.log('Registration successful:', response.data);
+
+        // Add a timeout before redirecting
+        setTimeout(() => {
+          this.$router.push('/admin/login'); // Redirect to the dashboard after 3 seconds
+        }, 3000);
+
         this.isLoading = false;
       } catch (error) {
         this.isLoading = false;
@@ -121,6 +131,7 @@ export default {
         }
       }
     },
+
   },
 };
 </script>
@@ -177,5 +188,13 @@ export default {
 
 small {
   font-size: 0.875rem;
+}
+
+@media (max-width: 768px) {
+  .myForm .row{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
 }
 </style>

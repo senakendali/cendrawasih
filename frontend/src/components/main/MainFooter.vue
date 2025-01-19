@@ -37,7 +37,7 @@
 
       <!-- Footer Bottom Text -->
       <div class="text-center pt-3 text-white">
-        &copy; 2024 Your Cenderawasih Juara Manajemen. All rights reserved.
+        &copy; 2025 Your Cenderawasih Juara Manajemen. All rights reserved.
       </div>
     </div>
   </footer>

@@ -19,3 +19,26 @@ body {
     color: #FFFFFF;
 }
 
+/* For mobile devices */
+@media only screen and (max-width: 600px) {
+
+    .main-container{
+        background-color: #000000;
+        min-height: 100vh;
+        padding-top: 100px; /* Adjust based on the height of your header */
+        padding-bottom: 20px;
+        color: #FFFFFF;
+    }
+  }
+  
+  /* For tablets */
+  @media only screen and (max-width: 768px) {
+    .main-container{
+        background-color: #000000;
+        min-height: 100vh;
+        padding-top: 100px; /* Adjust based on the height of your header */
+        padding-bottom: 20px;
+        color: #FFFFFF;
+    }
+  }
+

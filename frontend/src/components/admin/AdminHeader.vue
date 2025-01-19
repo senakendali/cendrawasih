@@ -49,6 +49,7 @@ export default {
     };
   },
   created() {
+    document.title = 'Cenderawasih Juara Manajemen | Admin'; // Set your desired title here
     this.checkAuthentication();
   },
   methods: {
