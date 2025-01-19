@@ -14,7 +14,8 @@
       <form @submit.prevent="submitForm" class="myForm" enctype="multipart/form-data">
         <div class="row">
           <div class="col-lg-6">
-            <img src="@/assets/images/main/banner/bogor-pencak-silat.jpg" class="img-fluid" />
+            <img :src="tournamentImage" class="img-fluid" alt="Tournament Image" />
+
           </div>
           <div class="col-lg-6">
             <!-- Form Fields -->
@@ -62,6 +63,7 @@ export default {
   name: 'RegistrationPage',
   data() {
     return {
+      tournamentImage:'',
       formData: {
         person_responsible: '',
         email: '',
@@ -72,7 +74,25 @@ export default {
       isLoading: false,
     };
   },
+  created() {
+    this.fetchTournamentDetail(this.$route.params.slug);
+  },
+  //
   methods: {
+    async fetchTournamentDetail(slug) {
+      this.isLoading = true; // Show loader
+      try {
+        const response = await axios.get(`/tournaments/detail/${slug}`);
+        if (response.data) {
+          this.tournamentImage = response.data.image;
+         
+        }
+      } catch (error) {
+        this.toast.error("Error fetching contingent details.");
+      } finally {
+        this.isLoading = false;
+      }
+    },
     async submitForm() {
       this.isLoading = true; // Show the loader
       this.errors = {}; // Reset errors before submitting

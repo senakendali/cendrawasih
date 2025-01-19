@@ -6,37 +6,15 @@
       
       <!-- Feature Items -->
       <div class="row">
-        <div class="col-md-6">
-
-        </div>
-        <div class="col-md-6 ">
-          <div class="activity-item mb-4">
-            <div class="activity-item-content">
-              <h5>Pendaftaran Peserta</h5>
-              <p>Pendaftaran peserta dapat dilakukan secara online, memudahkan panitia untuk mengelola data peserta.</p>
-            </div>
-          </div>
-          <div class="activity-item mb-4">
-            <div class="activity-item-content">
-              <h5>Technical Meeting</h5>
-              <p>Technical Meeting akan dilaksanakan pada tanggal 16 Februari 2025</p>
-            </div>
-          </div>
-        </div>
-       
-      </div>
-
-      <div class="row">
-        <div class="col-md-6 mb-4">
-          <div class="activity-item">
-            <div class="activity-item-content">
-              <h5>Pertandingan</h5>
-              <p>Pertandingan berlangsung dari tanggal 21 sampai 23 Februari 2025.
-                Pertandingan dilaksanakan di GOR Laga Satria, Pakansari</p>
-            </div>
-          </div>
-        </div>
         
+        <div class="col-md-6 ">
+          <div v-for="(activity, index) in activities" :key="index" class="activity-item mb-4">
+            <div class="activity-item-content">
+              <h5>{{ activity.name }}</h5>
+              <p>{{ activity.description }}</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -45,6 +23,12 @@
 <script>
 export default {
   name: 'OurActivity',
+  props: {
+      activities: {
+        type: Object,
+        required: true,
+      },
+    },
 };
 </script>
 

@@ -8,10 +8,7 @@
               
               <div class="tournament-info-item-content">
                 <h5>Lokasi</h5>
-                <p>
-                   GOR Laga Satria
-                  <br>
-                  Pakansari, Kec. Cibinong, Kab. Bogor, Jawa Barat 16915
+                <p v-html="tournament.location"> 
                 </p>
                 
               </div>
@@ -24,7 +21,7 @@
               
               <div class="tournament-info-item-content">
                 <h5>Tanggal Pertandingan</h5>
-                <p>21-23 Februari 2025</p>
+                <p>{{ tournament.event_date }}</p>
                 
               </div>
             </div>
@@ -37,10 +34,10 @@
               <div class="tournament-info-item-content">
                 <h5>Kategori</h5>
                 <ul>
-                  <li>Tanding</li>
-                  <li>Tunggal</li>
-                  <li>Ganda</li>
-                  <li>Regu</li>
+                  <li v-for="(matchCategory, index) in tournament.matchCategories" :key="index">
+                    {{ matchCategory.name }}
+                  </li>
+                  
                 </ul>
                 
               </div>
@@ -54,10 +51,9 @@
               <div class="tournament-info-item-content">
                 <h5>Usia</h5>
                 <ul>
-                  <li>Usia DINI 1</li>
-                  <li>Usia DINI 2</li>
-                  <li>Pra Remaja</li>
-                  <li>Remaja</li>
+                  <li v-for="(ageCategory, index) in tournament.ageCategories" :key="index">
+                    {{ ageCategory.name }}
+                  </li>
                 </ul>
                 
               </div>
@@ -71,6 +67,12 @@
   <script>
   export default {
     name: 'TournamentInfo',
+    props: {
+      tournament: {
+        type: Object,
+        required: true,
+      },
+    },
   };
   </script>
 

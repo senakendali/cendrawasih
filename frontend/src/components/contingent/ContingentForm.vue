@@ -71,6 +71,22 @@
           <!-- Person Responsible -->
           <div class="col-lg-6">
             <div class="mb-3">
+              <label for="country_id" class="form-label">Country</label>
+              <select
+                class="form-select"
+                id="country_id"
+                name="country_id"
+                v-model="form.country_id"
+                :class="{ 'is-invalid': errors.country_id }"
+              >
+                <option value="" disabled>Choose Country</option>
+                <option v-for="country in countries" :key="country.id" :value="country.id">
+                  <img src="{{ country.flag }}" alt="">{{ country.country_name }}
+                </option>
+              </select>
+              <div class="invalid-feedback">{{ errors.country_id }}</div>
+            </div>
+            <div class="mb-3">
               <label for="province_id" class="form-label">Provinsi</label>
               <select
                 class="form-select"
@@ -179,10 +195,6 @@ export default {
       type: Boolean,
       default: false,
     },
-    contingentId: {
-      type: [Number, String],
-      required: true,
-    },
   },
   setup() {
     const toast = useToast();
@@ -190,7 +202,8 @@ export default {
   },
   data() {
     return {
-      internalContingentId: this.contingentId,
+      contingentId: null,
+      countries: [],
       provinces: [],
       districts: [],
       sub_districts: [],
@@ -200,6 +213,7 @@ export default {
         pic_email: "",
         pic_name: "",
         pic_phone: "",
+        country_id: null,
         province_id: null,
         district_id: null,
         subdistrict_id: null,
@@ -213,6 +227,8 @@ export default {
   },
 
   created() {
+    this.contingentId = this.$route.params.id;
+    this.fetchCountries();
     this.fetchProvinces();
     if (this.isEdit && this.contingentId) {
       this.fetchContingentDetail(this.contingentId);
@@ -221,7 +237,8 @@ export default {
 
   beforeRouteUpdate(to, from, next) {
     if (this.isEdit && to.params.id !== this.contingentId) {
-      this.fetchContingentDetail(to.params.id);
+      this.contingentId = to.params.id;
+      this.fetchContingentDetail(this.contingentId);
     }
     next();
   },
@@ -233,6 +250,7 @@ export default {
       handler(newId) {
         // Fetch contingent data when route param changes
         if (this.isEdit && newId) {
+          this.contingentId = newId;
           this.fetchContingentDetail(newId); 
         }
       },
@@ -240,6 +258,14 @@ export default {
   },
 
   methods: {
+    async fetchCountries() {
+      try {
+        const response = await axios.get("/countries");
+        this.countries = response.data;
+      } catch (error) {
+        console.error("Error fetching countries:", error);
+      }
+    },
     async fetchProvinces() {
       try {
         const response = await axios.get("/provinces");
@@ -251,6 +277,11 @@ export default {
     async fetchDistricts() {
       if (!this.form.province_id) {
         this.districts = [];
+        this.form.district_id = null;
+        this.form.subdistrict_id = null;
+        this.form.ward_id = null;
+        this.sub_districts = [];
+        this.wards = [];
         return;
       }
       try {
@@ -263,6 +294,9 @@ export default {
     async fetchSubDistricts() {
       if (!this.form.district_id) {
         this.sub_districts = [];
+        this.form.subdistrict_id = null;
+        this.form.ward_id = null;
+        this.wards = [];
         return;
       }
       try {
@@ -275,6 +309,7 @@ export default {
     async fetchWards() {
       if (!this.form.subdistrict_id) {
         this.wards = [];
+        this.form.ward_id = null;
         return;
       }
       try {
@@ -287,19 +322,37 @@ export default {
     async fetchContingentDetail(id) {
       this.loading = true;
       try {
-        const response = await axios.get(`/contingents/${id}`);
+        const response = await axios.get(
+          `/contingents/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('authToken')}`
+            }
+          }
+        );
         if (response.data) {
           this.form = {
             name: response.data.name,
             pic_email: response.data.pic_email,
             pic_name: response.data.pic_name,
             pic_phone: response.data.pic_phone,
+            country_id: response.data.country_id,
             province_id: response.data.province_id,
             district_id: response.data.district_id,
             subdistrict_id: response.data.subdistrict_id,
             ward_id: response.data.ward_id,
             address: response.data.address,
           };
+
+          if (this.form.province_id) {
+            await this.fetchDistricts();
+          }
+          if (this.form.district_id) {
+            await this.fetchSubDistricts();
+          }
+          if (this.form.subdistrict_id) {
+            await this.fetchWards();
+          }
         }
       } catch (error) {
         this.toast.error("Error fetching contingent details.");
@@ -307,22 +360,25 @@ export default {
         this.loading = false;
       }
     },
+
+    
     async submitForm() {
       this.loading = true;
-      this.progress = 0;
-      const progressInterval = setInterval(() => {
-        if (this.progress < 90) {
-          this.progress += 10;
-        } else {
-          clearInterval(progressInterval);
-        }
-      }, 100);
 
       try {
-        const endpoint = this.isEdit ? `/contingents/${this.internalContingentId}` : "/contingents";
+        const endpoint = this.isEdit ? `/contingents/${this.contingentId}` : "/contingents";
         const method = this.isEdit ? "put" : "post";
 
-        await axios[method](endpoint, this.form);
+        await axios[method](
+          endpoint,
+          this.form,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`, // Add Authorization header
+            },
+          }
+        );
+
         this.toast.success(this.isEdit ? "Contingent updated successfully!" : "Contingent added successfully!");
         this.$router.push("/admin/contingent");
       } catch (error) {
@@ -333,14 +389,14 @@ export default {
           this.toast.error("An error occurred while submitting the form.");
         }
       } finally {
-        clearInterval(progressInterval);
-        this.progress = 100;
         this.loading = false;
       }
     },
+
   },
 };
 </script>
+
 
 <style scoped>
 .dashboard-container {
@@ -358,7 +414,7 @@ export default {
   left: 0;
   height: 5px;
   background-color: #388E3C;
-  transition: width 0.3s ease-in-out;
+  animation: loader-animation 1.5s infinite;
 }
 
 .page-title {
@@ -370,5 +426,21 @@ export default {
 .invalid-feedback {
   display: block;
   color: #dc3545;
+}
+
+/* Animasi garis loader */
+@keyframes loader-animation {
+  0% {
+    width: 0;
+    background-color: #388E3C; /* Warna awal */
+  }
+  50% {
+    width: 50%;
+    background-color: #388E3C; /* Warna saat animasi */
+  }
+  100% {
+    width: 100%;
+    background-color: #388E3C;
+  }
 }
 </style>

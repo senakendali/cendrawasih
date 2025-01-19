@@ -1,23 +1,13 @@
 <template>
   <div class="dashboard-container">
-    <!-- Loader: Top Progress Bar -->
-    <div
-      v-if="loading"
-      class="progress-bar"
-      :style="{ width: progress + '%' }"
-    ></div>
-
+    <div v-if="loading" class="loader-bar"></div>
     <div class="container">
-      <!-- Form Title -->
       <div class="mb-2 page-title">
-        <i class="bi bi-file-earmark-text"></i>
-        {{ isEdit ? "Edit Member" : "Add Member" }}
+        <i class="bi bi-file-earmark-text"></i> 
+        {{ isEdit ? "Edit Team Member" : "Add Member" }}
       </div>
-
-      <!-- Form -->
-      <form @submit.prevent="submitForm" class="admin-form mt-4">
+      <form @submit.prevent="submitForm" class="admin-form mt-4" enctype="multipart/form-data">
         <div class="row">
-          <!-- Contingent Name -->
           <div class="col-lg-6">
             <div class="mb-3">
               <label for="contingent_id" class="form-label">Kontingen</label>
@@ -59,7 +49,7 @@
               />
               <div class="invalid-feedback">{{ errors.birth_place }}</div>
             </div>
-
+            
             <div class="mb-3">
               <label for="birth_date" class="form-label">Birth Date</label>
               <input
@@ -71,7 +61,6 @@
               />
               <div class="invalid-feedback">{{ errors.birth_date }}</div>
             </div>
-
             <div class="mb-3">
               <label for="gender" class="form-label">Gender</label>
               <select
@@ -119,7 +108,7 @@
               <div class="invalid-feedback">{{ errors.nik }}</div>
             </div>
             <div class="mb-3">
-              <label for="family_card_number" class="form-label">Family Card Number (Nomor KK)</label>
+              <label for="family_card_number" class="form-label">Fammily Card Number (Nomor KK)</label>
               <input
                 type="text"
                 class="form-control"
@@ -129,30 +118,8 @@
               />
               <div class="invalid-feedback">{{ errors.family_card_number }}</div>
             </div>
-            
-
-           
           </div>
-
-          <!-- Person Responsible -->
           <div class="col-lg-6">
-            <div class="mb-3">
-              <label for="country_id" class="form-label">Country</label>
-              <select
-                class="form-select"
-                id="country_id"
-                name="country_id"
-                v-model="form.country_id"
-                @change="fetchDistricts"
-                :class="{ 'is-invalid': errors.country_id }"
-              >
-                <option value="" disabled>Choose Country</option>
-                <option v-for="country in countries" :key="country.id" :value="country.id">
-                  <img src="{{ country.flag }}" alt="">{{ country.country_name }}
-                </option>
-              </select>
-              <div class="invalid-feedback">{{ errors.country_id }}</div>
-            </div>
             <div class="mb-3">
               <label for="province_id" class="form-label">Provinsi</label>
               <select
@@ -234,7 +201,6 @@
               ></textarea>
               <div class="invalid-feedback">{{ errors.address }}</div>
             </div>
-
             <div class="mb-3">
               <label for="category" class="form-label">Kategori</label>
               <select
@@ -248,28 +214,62 @@
               </select>
               <div class="invalid-feedback">{{ errors.category }}</div>
             </div>
-
             <div class="mb-3">
-              <label for="documents" class="form-label">Document Link (Google Drive)</label>
-              <input
-                type="text"
-                class="form-control"
-                :class="{ 'is-invalid': errors.documents }"
-                id="documents"
-                v-model="form.documents"
+              <label for="id_card_document" class="form-label">KTP</label>
+              <input 
+                class="form-control" 
+                type="file" 
+                id="id_card_document" 
+                @change="handleFileUpload('id_card_document', $event)" 
               />
-              <div class="invalid-feedback">{{ errors.documents }}</div>
             </div>
+            <div class="mb-3">
+              <label for="family_card_document" class="form-label">Kartu Keluarga</label>
+              <input 
+                class="form-control" 
+                type="file" 
+                id="family_card_document" 
+                @change="handleFileUpload('family_card_document', $event)" 
+              />
+            </div>
+            <div class="mb-3">
+              <label for="certificate_of_health" class="form-label">Surat Sehat</label>
+              <input 
+                class="form-control" 
+                type="file" 
+                id="certificate_of_health" 
+                @change="handleFileUpload('certificate_of_health', $event)" 
+              />
+            </div>
+            <div class="mb-3">
+              <label for="recomendation_letter" class="form-label">Surat Rekomendasi</label>
+              <input 
+                class="form-control" 
+                type="file" 
+                id="recomendation_letter" 
+                @change="handleFileUpload('recomendation_letter', $event)" 
+              />
+            </div>
+            <div class="mb-3">
+              <label for="parental_permission_letter" class="form-label">Surat Izin Orang Tua</label>
+              <input 
+                class="form-control" 
+                type="file" 
+                id="parental_permission_letter" 
+                @change="handleFileUpload('parental_permission_letter', $event)" 
+              />
+            </div>
+
             
           </div>
+          
         </div>
-
-        <!-- Submit Button -->
+       
         <div class="row">
           <div class="col-lg-12 text-center">
             <button type="submit" class="button button-primary" :disabled="loading">
               <i class="bi bi-floppy"></i>
-              <span>{{ isEdit ? "Update Member" : "Add Member" }}</span>
+              <span>{{ isEdit ? "Save Changes" : "Save Data" }}</span>
             </button>
           </div>
         </div>
@@ -298,7 +298,6 @@ export default {
     return {
       memberId: null,
       contingents: [],
-      countries: [],
       provinces: [],
       districts: [],
       sub_districts: [],
@@ -314,77 +313,37 @@ export default {
         blood_type: "",
         nik: "",
         family_card_number: "",
-        country_id: null,
         province_id: null,
         district_id: null,
         subdistrict_id: null,
         ward_id: null,
         address: "",
         category: "",
-        documents: "",
+        files: {},
       },
       errors: {},
       loading: false,
       progress: 0,
     };
   },
-
   created() {
     this.memberId = this.$route.params.id;
-    this.fetchCountries();
     this.fetchProvinces();
     this.fetchContingents();
     if (this.isEdit && this.memberId) {
       this.fetchMemberDetail(this.memberId);
     }
   },
-
-  beforeRouteUpdate(to, from, next) {
-    if (this.isEdit && to.params.id !== this.memberId) {
-      this.memberId = to.params.id;
-      this.fetchMemberDetail(this.memberId);
-    }
-    next();
-  },
-
-  watch: {
-    // Watch for changes to the memberId from the route params
-    '$route.params.id': {
-      immediate: true,
-      handler(newId) {
-        // Fetch contingent data when route param changes
-        if (this.isEdit && newId) {
-          this.memberId = newId;
-          this.fetchMemberDetail(newId); 
-        }
-      },
-    }
-  },
-
   methods: {
+    handleFileUpload(field, event) {
+      this.form.files[field] = event.target.files[0];
+    },
     async fetchContingents() {
       try {
-        // Fetch contingents
-        const response = await axios.get(
-          `/contingents/fetch-all`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('authToken')}`
-            }
-          }
-        );
-        this.contingents = response.data;
+        const response = await axios.get("/contingents/fetch-all");
+        this.contingents = response.data.data;
       } catch (error) {
         console.error("Error fetching contingents:", error);
-      }
-    },
-
-    async fetchCountries() {
-      try {
-        const response = await axios.get("/countries");
-        this.countries = response.data;
-      } catch (error) {
-        console.error("Error fetching countries:", error);
       }
     },
     async fetchProvinces() {
@@ -443,14 +402,7 @@ export default {
     async fetchMemberDetail(id) {
       this.loading = true;
       try {
-        const response = await axios.get(
-          `/team-members/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('authToken')}`
-            }
-          }
-        );
+        const response = await axios.get(`/team-members/${id}`);
         if (response.data) {
           this.form = {
             name: response.data.name || "",
@@ -463,14 +415,13 @@ export default {
             blood_type: response.data.blood_type || "",
             nik: response.data.nik || "",
             family_card_number: response.data.family_card_number || "",
-            country_id: response.data.country_id || null,
             province_id: response.data.province_id || null,
             district_id: response.data.district_id || null,
             subdistrict_id: response.data.subdistrict_id || null,
             ward_id: response.data.ward_id || null,
             address: response.data.address || "",
             category: response.data.category || "",
-            documents: response.data.documents || "",
+            files: {},
           };
 
           if (this.form.province_id) {
@@ -490,43 +441,47 @@ export default {
         this.loading = false;
       }
     },
-
-    
+    updateProgress(step) {
+      this.progress += step;
+    },
+    resetProgress() {
+      this.progress = 0;
+    },
     async submitForm() {
       this.loading = true;
-      
+      const formData = new FormData();
 
-     
-
-     
-
-      // Log FormData for debugging
-      /*for (let pair of formData.entries()) {
-        console.log(pair[0] + ": " + pair[1]);
-      }*/
+      // Append form fields to formData
+      Object.keys(this.form).forEach((key) => {
+        if (key === "files") {
+          for (const [field, file] of Object.entries(this.form.files)) {
+            formData.append(field, file);
+          }
+        } else {
+          formData.append(key, this.form[key]);
+        }
+      });
 
       try {
+        this.errors = {};
         const endpoint = this.isEdit ? `/team-members/${this.memberId}` : "/team-members";
         const method = this.isEdit ? "put" : "post";
 
-        await axios[method](
-          endpoint,
-          this.form,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("authToken")}`, // Add Authorization header
-            },
-          }
-        );
+        await axios[method](endpoint, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
 
-        this.toast.success(this.isEdit ? "Team member updated successfully!" : "Team member added successfully!");
+        this.toast.success(
+          this.isEdit ? "Member updated successfully!" : "Member created successfully!"
+        );
         this.$router.push("/admin/team-members");
       } catch (error) {
         if (error.response && error.response.data.errors) {
           this.errors = error.response.data.errors;
-          this.toast.error("An error occurred while submitting the form.");
         } else {
-          this.toast.error("An error occurred while submitting the form.");
+          this.toast.error("Error processing the form.");
         }
       } finally {
         this.loading = false;
@@ -539,32 +494,17 @@ export default {
 
 <style scoped>
 .dashboard-container {
-  background-color: #ffffff;
-  margin-top: 80px;
-  padding: 20px;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  position: relative; /* For positioning progress bar */
+  position: relative;
 }
 
-.progress-bar {
+.loader-bar {
   position: absolute;
   top: 0;
   left: 0;
-  height: 5px;
-  background-color: #388E3C;
+  height: 4px;
+  width: 0;
+  background-color: #388E3C; /* Warna loader */
   animation: loader-animation 1.5s infinite;
-}
-
-.page-title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 20px;
-}
-
-.invalid-feedback {
-  display: block;
-  color: #dc3545;
 }
 
 /* Animasi garis loader */

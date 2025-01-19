@@ -1,40 +1,47 @@
 <template>
   <div class="dashboard-container">
+    <div
+      v-if="loading"
+      class="progress-bar"
+      :style="{ width: progress + '%' }"
+    ></div>
+
     <div class="mb-2 page-title">
       <i class="bi bi-file-earmark-text"></i> Contingent List
     </div>
 
-    <div class="mb-2 d-flex justify-content-between align-items-center">
+    <div class="mb-2 d-flex justify-content-end align-items-center">
       <!-- Search Bar -->
-      <input 
+      <!--input 
         v-model="searchQuery" 
         type="text" 
         class="form-control w-auto" 
-        placeholder="Search contingents..." 
-        @input="searchContingents" 
-      />
+        placeholder="Search..." 
+        @input="searchContingent" 
+      /-->
 
-      <!-- Create Contingent Button -->
+      <!-- Create Menu Button -->
       <router-link to="/admin/contingent/create" class="button button-primary">
-        <i class="bi bi-plus-square"></i> Add Contingent
+        <i class="bi bi-plus-square"></i> Add New
       </router-link>
     </div>
 
-    <!-- Table to display contingent data -->
+    <!-- Table to display navigation data -->
     <table class="table mt-4">
       <thead>
         <tr>
           <th>ID</th>
           <th>Contingent Name</th>
-          <th>PIC</th>
+          <th>PIC Name</th>
           <th>PIC Phone</th>
           <th>PIC Email</th>
           <th>Actions</th>
         </tr>
       </thead>
-      <tbody>
-        <tr v-for="contingent in contingents.data" :key="contingent.id">
-          <td class="number-column">{{ contingent.id }}</td>
+      <tbody v-if="contingents.length > 0">
+        <tr v-for="(contingent, index) in contingents" :key="contingent.id">
+        <td>{{ index + 1 + (currentPage - 1) * perPage }}</td>
+       
           <td>{{ contingent.name }}</td>
           <td>{{ contingent.pic_name }}</td>
           <td>{{ contingent.pic_phone }}</td>
@@ -45,25 +52,51 @@
                 <i class="bi bi-card-checklist"></i> Action
               </button>
               <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#" @click.prevent="editContingent(contingent.id)"><i class="bi bi-pencil-square"></i> Edit</a></li>
-                <li><a class="dropdown-item" href="#" @click.prevent="deleteContingent(contingent.id)"><i class="bi bi-trash"></i> Delete</a></li>
+                <li><a class="dropdown-item" href="#" @click="EditContingent(contingent.id)"><i class="bi bi-pencil-square"></i> Edit</a></li>
+                <!--li><a class="dropdown-item" href="#" @click="deleteContingent(contingent.id)"><i class="bi bi-trash"></i> Delete</a></li-->
               </ul>
             </div>
           </td>
         </tr>
       </tbody>
+      <tbody v-else>
+        <tr>
+          <td colspan="6" class="text-center">No data found.</td>
+        </tr>
+      </tbody>
     </table>
 
     <!-- Pagination Controls -->
-    <div class="pagination mt-4">
-      <button @click="changePage(currentPage - 1)" :disabled="currentPage === 1" class="btn btn-secondary">
-        Previous
-      </button>
-      <span>Page {{ currentPage }} of {{ totalPages }}</span>
-      <button @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages" class="btn btn-secondary">
-        Next
-      </button>
-    </div>
+    <nav v-if="totalPages > 1">
+      <ul class="pagination pagination-lg justify-content-end">
+        <li class="page-item" :class="{ disabled: !prevPageUrl }">
+          <button
+            class="page-link"
+            @click="changePage(currentPage - 1)"
+            :disabled="!prevPageUrl"
+          >
+          <i class="bi bi-arrow-left-square"></i>
+          </button>
+        </li>
+        <li
+          v-for="page in totalPages"
+          :key="page"
+          class="page-item"
+          :class="{ active: currentPage === page }"
+        >
+          <button class="page-link" @click="changePage(page)">{{ page }}</button>
+        </li>
+        <li class="page-item" :class="{ disabled: !nextPageUrl }">
+          <button
+            class="page-link"
+            @click="changePage(currentPage + 1)"
+            :disabled="!nextPageUrl"
+          >
+          <i class="bi bi-arrow-right-square"></i>
+          </button>
+        </li>
+      </ul>
+    </nav>
   </div>
 </template>
 
@@ -77,59 +110,83 @@ export default {
   name: "ContingentList",
   data() {
     return {
-      contingents: { data: [] }, // Paginated contingent data
-      currentPage: 1, // Current page number
-      totalPages: 1, // Total number of pages
-      perPage: 10, // Records per page
-      searchQuery: "", // Search query
+      contingents: [],
+      searchQuery: "", // User's search input
+      currentPage: 1, // Current page of results
+      perPage: 10, // Results per page
+      totalPages: 0, // Total number of pages
+      prevPageUrl: null, // URL of the previous page
+      nextPageUrl: null, // URL of the next page
+      loading: false,
+      progress: 0,
     };
   },
   mounted() {
-    this.loadContingents(); // Fetch contingents when the component loads
+    this.loadContingent(); // Corrected the method name
   },
   methods: {
-    async loadContingents(page = 1) {
+    async loadContingent(page = 1) {
+      this.loading = true;
+      console.log(this.loading);
       try {
+        this.loading = true;
+
         const response = await axios.get("/contingents", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`, // Assumes token is in localStorage
+          },
           params: {
-            page: page,
+            page,
             perPage: this.perPage,
-            search: this.searchQuery, // Search query
+            search: this.searchQuery.trim(),
           },
         });
+        const {
+          current_page,
+          last_page,
+          data,
+          next_page_url,
+          prev_page_url,
+        } = response.data;
 
-        if (response.data) {
-          this.contingents = response.data; // Store contingent data
-          this.currentPage = response.data.current_page || 1; // Update current page
-          this.totalPages = response.data.total_pages || 1; // Update total pages
-        }
+        this.contingents = data; // Assign team members
+        this.currentPage = current_page; // Current page
+        this.totalPages = last_page; // Total pages
+        this.nextPageUrl = next_page_url; // Next page URL
+        this.prevPageUrl = prev_page_url; // Previous page URL
+        this.loading = false;
       } catch (error) {
-        console.error("Error fetching contingents:", error);
+        console.error("Error loading members:", error);
       }
     },
 
     changePage(page) {
       if (page >= 1 && page <= this.totalPages) {
-        this.loadContingents(page); // Fetch data for the selected page
+        this.loadContingent(page);
       }
     },
 
-    searchContingents() {
-      this.loadContingents(); // Refresh data on search
+
+    searchContingent() {
+      this.currentPage = 1; // Reset to page 1 for new search
+      this.loadContingent();
     },
 
-    async editContingent(id) {
+    EditContingent(id) {
       this.$router.push({ name: "EditContingent", params: { id } });
     },
-    
 
-    async deleteContingent(id) {
-      try {
-        await axios.delete(`/contingents/${id}`);
-        this.loadContingents(); // Refresh list after deletion
-      } catch (error) {
-        console.error("Error deleting contingent:", error);
-      }
+    deleteContingent(id) {
+      console.log("Delete contingent with ID:", id);
+      // Implement logic to delete the contingent (e.g., API call)
+    },
+  },
+  computed: {
+    prevPageExists() {
+      return this.currentPage > 1;
+    },
+    nextPageExists() {
+      return this.currentPage < this.totalPages;
     },
   },
 };
@@ -142,6 +199,7 @@ export default {
   padding: 20px;
   border-radius: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
 }
 
 .table th,
@@ -149,13 +207,46 @@ export default {
   padding: 10px;
 }
 
-.pagination button {
-  padding: 5px 10px;
-  cursor: pointer;
-  margin: 0 10px;
+.navbar {
+  background-color: #1E2A57 !important;
 }
+
+.navbar-toggler-icon {
+  background-color: white;
+}
+
+.nav-link {
+  color: white !important;
+}
+
+
 
 .form-control {
   width: 250px;
+}
+
+.progress-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 5px;
+  background-color: #388E3C;
+  animation: loader-animation 1.5s infinite;
+}
+
+/* Animasi garis loader */
+@keyframes loader-animation {
+  0% {
+    width: 0;
+    background-color: #388E3C; /* Warna awal */
+  }
+  50% {
+    width: 50%;
+    background-color: #388E3C; /* Warna saat animasi */
+  }
+  100% {
+    width: 100%;
+    background-color: #388E3C;
+  }
 }
 </style>

@@ -6,25 +6,38 @@
     <!-- Main Banner Section -->
     <div class="image-container w-100 h-100">
       <img src="@/assets/images/main/banner/main-banner.png" alt="Logo" class="img-fluid w-100 h-100" />
-      <div :class="['caption-overlay', isScrolled ? 'scrolled' : '']">
+      <div v-if="!isLoading" :class="['caption-overlay', isScrolled ? 'scrolled' : '']">
         <div class="caption-content">
-          <h1 class="caption-title">Bogor Pencak Silat Series 1 Tahun 2025</h1>
+          <h1 class="caption-title">{{ tournamentName }}</h1>
           <p class="caption-description">
-            Kami mengundang para pesilat berbakat untuk bergabung dalam ajang yang penuh semangat dan prestisius ini. Tunjukkan keahlian Anda dalam seni bela diri tradisional Indonesia dan buktikan bahwa Anda layak menjadi yang terbaik.
+            {{ tournamentDescription }}
           </p>
           <div class="d-flex gap-2 justify-content-center">
-            <router-link to="/pendaftaran" class="btn btn-primary">Daftar</router-link>
-            <button @click="downloadDocument('PROPOSAL-BPSS1.pdf')" class="btn btn-primary">Download</button>
+            
+            <router-link
+              v-if="slug"
+              :to="{ name: 'registration', params: { slug: slug } }"
+              class="btn btn-primary"
+            >
+            Daftar
+          </router-link>
+            <button @click="downloadDocument(document)" class="btn btn-primary">Download</button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Why Us Section -->
-    <TournamentInfo />
+    <TournamentInfo
+      :tournament="{
+        location: tournamentLocation,
+        event_date: tournamentDate,
+        matchCategories:matchCategories,
+        ageCategories:ageCategories
+      }"
+    />
 
     <!-- Our Activity Section -->
-    <OurActivity />
+    <OurActivity :activities="activities"/>
   </div>
 </template>
 
@@ -44,7 +57,23 @@ export default {
     return {
       isScrolled: false,
       isLoading: false, // State to manage loader visibility
+      tournamentId: null,
+      tournamentName: '',
+      slug: '',
+      tournamentDescription: '',
+      tournamentDate: '',
+      tournamentLocation: '',
+      dateStart: '',
+      dateEnd: '',
+      document: '',
+      matchCategories: [],
+      ageCategories: [],
+      activities: [],
     };
+  },
+
+  created() {
+    this.fetchTournamentDetail();
   },
   mounted() {
     window.addEventListener('scroll', this.handleScroll);
@@ -55,6 +84,31 @@ export default {
   methods: {
     handleScroll() {
       this.isScrolled = window.scrollY > 100;
+    },
+
+    async fetchTournamentDetail() {
+      this.isLoading = true; // Show loader
+      try {
+        const response = await axios.get(`/tournaments/highlight`);
+        if (response.data) {
+          this.tournamentId = response.data.id;
+          this.tournamentName = response.data.name;
+          this.slug = response.data.slug;
+          this.tournamentDescription = response.data.description;
+          this.tournamentDate = response.data.event_date;
+          this.tournamentLocation = response.data.location;
+          this.dateStart = response.data.start_date;
+          this.dateEnd = response.data.end_date;
+          this.matchCategories = response.data.categories;
+          this.ageCategories = response.data.age_categories;
+          this.document = response.data.document;
+          this.activities = response.data.activities;
+        }
+      } catch (error) {
+        this.toast.error("Error fetching contingent details.");
+      } finally {
+        this.isLoading = false;
+      }
     },
     async downloadDocument(filename) {
       this.isLoading = true; // Show loader

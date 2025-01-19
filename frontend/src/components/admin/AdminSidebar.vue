@@ -1,7 +1,7 @@
 <template>
   <aside class="sidebar">
     <a class="navbar-brand" href="#">
-      <img src="@/assets/app-logo.png" alt="Logo" />
+      <img src="@/assets/float-logo.png" alt="Logo" />
     </a>
     <ul class="nav flex-column">
       <li v-for="menu in menus" :key="menu.id" class="nav-item">
@@ -86,7 +86,7 @@ export default {
 }
 
 .navbar-brand img {
-  max-width: 100px;
+  max-width: 150px;
   height: auto;
 }
 

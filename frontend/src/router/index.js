@@ -4,9 +4,12 @@ import HomePage from '../main/pages/HomePage.vue';
 import AdminLayout from '../admin/layouts/AdminLayout.vue';
 import LoginLayout from '../admin/layouts/LoginLayout.vue';
 import DashboardPage from '../admin/pages/DashboardPage.vue';
+import ContingentRegistrationPage from '../admin/pages/ContingentRegistrationPage.vue';
 import LoginPage from '../admin/pages/LoginPage.vue';
 import RegistrationPage from '@/main/pages/RegistrationPage.vue';
 import TournamentPage from '@/main/pages/TournamentPage.vue';
+import AboutPage from '@/main/pages/AboutPage.vue';
+import PrivacyPolicyPage from '@/main/pages/PrivacyPolicyPage.vue';
 import SchedulePage from '@/main/pages/SchedulePage.vue';
 import GalleryDetail from '@/main/pages/GalleryDetail.vue';
 import AdminNavigationList from '../admin/pages/navigation/NavigationList.vue';
@@ -29,12 +32,32 @@ const routes = [
     ]
   },
   {
-    path: '/pendaftaran',
+    path: '/about-us',
     component: MainLayout,
     children: [
-      { path: '', component: RegistrationPage }
+      { path: '', component: AboutPage }
     ]
   },
+  {
+    path: '/privacy-policy',
+    component: MainLayout,
+    children: [
+      { path: '', component: PrivacyPolicyPage }
+    ]
+  },
+  
+  {
+    path: '/registration/:slug',
+    component: MainLayout,
+    children: [
+      {
+        props: true, // Kirim parameter ID ke komponen sebagai props
+        name: 'registration', // Name should be here in the child route
+        path: '', // Child route should not redefine ":id"
+        component: RegistrationPage,
+      },
+    ],
+  },  
   {
     path: '/kejuaraan',
     component: MainLayout, // Use MainLayout for all /kejuaraan routes
@@ -54,7 +77,7 @@ const routes = [
   },
   
   {
-    path: '/jadwal',
+    path: '/schedule',
     component: MainLayout,
     children: [
       { path: '', component: SchedulePage }
@@ -67,6 +90,18 @@ const routes = [
       { path: '', component: DashboardPage }
     ]
   },
+  {
+    path: '/contingent-registration/:id',
+    component: AdminLayout,
+    children: [
+      {
+        props: true, // Kirim parameter ID ke komponen sebagai props
+        name: 'contingent-registration', // Name should be here in the child route
+        path: '', // Child route should not redefine ":id"
+        component: ContingentRegistrationPage,
+      },
+    ],
+  },  
   { 
     path: '/admin/login', 
     component: LoginLayout, 

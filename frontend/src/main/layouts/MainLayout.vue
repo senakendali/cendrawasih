@@ -1,11 +1,13 @@
 <template>
   <div>
-    <!-- Loading Indicator -->
-    <div v-if="isLoading" class="loading-bar"></div>
+    <!-- Loading Overlay and Indicator -->
+    <div v-if="isLoading" class="loading-container">
+      <div class="loading-bar"></div>
+    </div>
 
     <MainHeader />
     
-    <main v-if="!isLoading">
+    <main :class="{ 'fade-in': !isLoading }">
       <router-view></router-view>
     </main>
 
@@ -38,15 +40,25 @@ export default {
 </script>
 
 <style scoped>
-/* Loading Bar Style */
-.loading-bar {
+/* Loading Container */
+.loading-container {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 1); /* Black color for the overlay */
+  z-index: 9999; /* Ensure the overlay stays on top */
+}
+
+/* Loading Bar Style */
+.loading-bar {
+  position: absolute;
+  top: 0; /* Position at the top */
+  left: 0;
+  width: 100%;
   height: 4px;
   background-color: #D32F2F; /* Red color for the loader */
-  z-index: 9999; /* Ensure the loader stays on top */
   animation: loading 1s infinite linear; /* Animation for the loader */
 }
 
@@ -60,8 +72,13 @@ export default {
   }
 }
 
+/* Fade-in Transition for Main Content */
 main {
-  display: block; /* Ensure the main content is hidden until loading is done */
-  transition: opacity 0.3s ease-in-out;
+  opacity: 0; /* Start with opacity 0 */
+  transition: opacity 0.5s ease-in-out; /* Smooth transition for opacity */
+}
+
+main.fade-in {
+  opacity: 1; /* Fade to opacity 1 */
 }
 </style>

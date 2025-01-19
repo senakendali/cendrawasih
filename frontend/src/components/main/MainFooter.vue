@@ -8,7 +8,8 @@
           <div class="col-md-9">
             <h5>About Us</h5>
             <p class="text-white">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius, sapiente. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Recusandae, ducimus.
+              Cenderawasih Juara Manajemen, Established in 2024, we are a premier sports event promoter dedicated to delivering exceptional experiences for fans and participants alike. With a commitment to professionalism, innovation, and the spirit of sportsmanship, we organize a wide range of events, from local tournaments to national and international competitions.
+
             </p>
           </div>
 
@@ -16,8 +17,8 @@
           <div class="col-md-3">
             <div class="footer-contact text-start">
               <h5>Contact Us</h5>
-              <p>Phone: +1 (555) 123-4567</p>
-              <p>Email: info@yourcompany.com</p>
+              <p>Phone: +6285956554607</p>
+              <p>Email: manajemencendrawasihjuara@gmail.com</p>
             </div>
           </div>
         </div>
@@ -26,9 +27,9 @@
         <div class="row pt-3">
           <div class="col-12">
             <div class="footer-links d-flex justify-content-center">
-              <a href="/terms" class="footer-link">Terms & Conditions</a>
-              <span class="footer-link-divider mx-2">|</span> 
-              <a href="/privacy" class="footer-link">Privacy Policy</a>
+              
+              
+              <router-link to="/privacy-policy" class="footer-link" exact-active-class="active">Privacy Policy</router-link>
             </div>
           </div>
         </div>
@@ -36,7 +37,7 @@
 
       <!-- Footer Bottom Text -->
       <div class="text-center pt-3 text-white">
-        &copy; 2023 Your Company. All rights reserved.
+        &copy; 2024 Your Cenderawasih Juara Manajemen. All rights reserved.
       </div>
     </div>
   </footer>

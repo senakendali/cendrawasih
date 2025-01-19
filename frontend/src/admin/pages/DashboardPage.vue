@@ -1,9 +1,12 @@
 <template>
   <div class="dashboard">
-    <h1>Admin Dashboard</h1>
-    <p v-if="userName">Welcome, {{ userName }}!</p>
-    <p v-else>Loading user data...</p>
+    <div class="dashboard-container mb-3">
 
+    
+      <p v-if="userName">Welcome, {{ userName }}! Senang bertemu lagi.</p>
+      <p v-else>Loading user data...</p>
+      <p>Dibawah ini adalah kejuaran yang bisa Anda ikuti. Silahkan klik tombol daftar untuk mendaftarkan kontingen Anda.</p>
+    </div>
     <div class="row row-cols-1 row-cols-md-3 g-4">
       <!-- Tournament Cards -->
       <div
@@ -12,15 +15,26 @@
         :key="tournament.id"
       >
         <div class="card">
+          <div class="card-image">
+            <img src="@/assets/images/admin/silat.png" alt="" class="img-fluid">
+          </div>
+         
           <div class="card-body">
+            
             <h5 class="card-title">{{ tournament.name }}</h5>
-            <p class="card-text">{{ tournament.details }}</p>
-            <ul class="list-unstyled">
-              <li><strong>Location:</strong> {{ tournament.location }}</li>
-              <li><strong>Start Date:</strong> {{ tournament.startDate }}</li>
-              <li><strong>Participants:</strong> {{ tournament.participants.join(', ') }}</li>
-            </ul>
-            <button class="btn btn-primary">View Details</button>
+            <p class="card-text">{{ tournament.description }}</p>
+           
+            <div class="d-flex gap-2 justify-content-start">
+              <router-link
+              :to="{ name: 'contingent-registration', params: { id: tournament.id } }"
+              class="button button-secondary"
+              >
+              Daftar
+              </router-link>
+              <button @click="downloadDocument(tournament.document)" class="button button-secondary">Download</button>
+            </div>
+            
+          
           </div>
         </div>
       </div>
@@ -44,6 +58,13 @@ export default {
     return {
       userName: null, // Store user's name here
       tournaments: [], // Store tournament data
+      searchQuery: "", // User's search input
+      currentPage: 1, // Current page of results
+      perPage: 10, // Results per page
+      totalPages: 0, // Total number of pages
+      prevPageUrl: null, // URL of the previous page
+      nextPageUrl: null, // URL of the next page
+      loading: false,
     };
   },
   mounted() {
@@ -87,34 +108,65 @@ export default {
         }
       }
     },
+
+    async downloadDocument(filename) {
+      this.isLoading = true; // Show loader
+      try {
+        const response = await axios.get(
+          `/download-document/${filename}`,
+          { responseType: 'blob' } // Ensure the file is treated as binary data
+        );
+
+        // Create a link element and trigger a download
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', filename); // Set the downloaded file name
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      } catch (error) {
+        console.error('Error downloading the document:', error);
+        alert('Failed to download the document. Please try again later.');
+      } finally {
+        this.isLoading = false; // Hide loader
+      }
+    },
     // Sample method to load tournament data
-    loadTournamentData() {
-      this.tournaments = [
-        {
-          id: 1,
-          name: "Spring Martial Arts Tournament",
-          details: "This tournament features multiple martial arts disciplines including karate, judo, and taekwondo.",
-          location: "Tokyo, Japan",
-          startDate: "2025-04-15",
-          participants: ["Alice", "Bob", "Charlie", "David"],
-        },
-        {
-          id: 2,
-          name: "Summer Fighting Championship",
-          details: "A high-stakes fighting championship with intense competition among the world's best fighters.",
-          location: "Las Vegas, USA",
-          startDate: "2025-06-10",
-          participants: ["Eve", "Frank", "Grace", "Henry"],
-        },
-        {
-          id: 3,
-          name: "Winter Martial Arts League",
-          details: "A prestigious tournament that brings together martial artists from around the world.",
-          location: "Moscow, Russia",
-          startDate: "2025-12-01",
-          participants: ["Ivy", "Jack", "Kathy", "Liam"],
-        },
-      ];
+    async loadTournamentData(page = 1) {
+      this.loading = true;
+      console.log(this.loading);
+      try {
+        const response = await axios.get("/tournaments", {
+          params: {
+            page,
+            perPage: this.perPage,
+            search: this.searchQuery.trim(),
+          },
+        });
+        const {
+          current_page,
+          last_page,
+          data,
+          next_page_url,
+          prev_page_url,
+        } = response.data;
+
+        this.tournaments = data; // Assign team members
+        this.currentPage = current_page; // Current page
+        this.totalPages = last_page; // Total pages
+        this.nextPageUrl = next_page_url; // Next page URL
+        this.prevPageUrl = prev_page_url; // Previous page URL
+        this.loading = false;
+      } catch (error) {
+        console.error("Error loading members:", error);
+      }
+    },
+
+    changePage(page) {
+      if (page >= 1 && page <= this.totalPages) {
+        this.loadTournamentData(page);
+      }
     },
   },
 };
@@ -130,7 +182,7 @@ export default {
 
 .card {
   border: none;
-  border-top: 3px solid #1E2A57;
+  border-top: 5px solid #388E3C;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
   border-bottom-left-radius: 10px;
@@ -138,8 +190,8 @@ export default {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.card-img-top {
-  border-radius: 10px 10px 0 0;
+.card-image {
+  margin-top: 20px;
   max-height: 200px;
   object-fit: cover;
 }
